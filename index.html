@@ -1,0 +1,1747 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PAYT - Sistema de Gestão de Cobranças</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #C41E3A;
+            --primary-dark: #A01830;
+            --secondary: #2C3E50;
+            --accent: #27AE60;
+            --accent-light: #E8F8F5;
+            --neutral-light: #ECF0F1;
+            --neutral-dark: #34495E;
+            --text-dark: #2C3E50;
+            --text-light: #FFFFFF;
+            --border-light: #E0E0E0;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --shadow-hover: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #F5F7FA 0%, #C9D6DE 100%);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        /* Barra de Navegação */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 500;
+            transition: color 0.3s ease;
+            cursor: pointer;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        /* Mobile Menu Toggle */
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            gap: 5px;
+            z-index: 1001;
+        }
+
+        .menu-toggle span {
+            width: 25px;
+            height: 3px;
+            background: var(--primary);
+            transition: all 0.3s ease;
+            border-radius: 2px;
+        }
+
+        .menu-toggle.active span:nth-child(1) {
+            transform: rotate(45deg) translate(8px, 8px);
+        }
+
+        .menu-toggle.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .menu-toggle.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -7px);
+        }
+
+        /* Mobile Menu Overlay */
+        .menu-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .menu-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Container Principal */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 6rem 2rem 2rem;
+        }
+
+        /* Seções */
+        section {
+            background: white;
+            border-radius: 16px;
+            padding: 4rem;
+            margin-bottom: 3rem;
+            box-shadow: var(--shadow);
+            scroll-margin-top: 100px;
+        }
+
+        section:hover {
+            box-shadow: var(--shadow-hover);
+            transition: box-shadow 0.3s ease;
+        }
+
+        /* Títulos */
+        h1 {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        h2 {
+            font-size: 2.2rem;
+            color: var(--secondary);
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+            position: relative;
+            padding-bottom: 1rem;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 4px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+
+        h3 {
+            font-size: 1.4rem;
+            color: var(--secondary);
+            margin: 1.5rem 0 1rem;
+            font-weight: 600;
+        }
+
+        /* Seção Hero */
+        .hero {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            text-align: center;
+            padding: 5rem 4rem !important;
+            border-radius: 20px;
+        }
+
+        .hero h1 {
+            color: white;
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            opacity: 0.95;
+            margin-bottom: 2rem;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+        }
+
+        /* Botões */
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(196, 30, 58, 0.3);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .btn-small {
+            padding: 0.8rem 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        /* Grid Layouts */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        /* Cards */
+        .card {
+            background: #FAFBFC;
+            border: 2px solid var(--border-light);
+            border-radius: 12px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--primary);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 10px 30px rgba(196, 30, 58, 0.1);
+            transform: translateY(-5px);
+        }
+
+        .card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .card h3 {
+            margin-top: 0;
+            margin-bottom: 1rem;
+        }
+
+
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            background: var(--accent-light);
+            color: var(--accent);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-right: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .badge-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Boxes de Destaque */
+        .highlight-box {
+            background: linear-gradient(135deg, #F5F7FA 0%, #E8F8F5 100%);
+            border-left: 5px solid var(--accent);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+        }
+
+        .highlight-box.warning {
+            border-left-color: #E67E22;
+            background: linear-gradient(135deg, #FEF5E7 0%, #FCF3E6 100%);
+        }
+
+        .highlight-box.danger {
+            border-left-color: var(--primary);
+            background: linear-gradient(135deg, #FBE9E7 0%, #FCE4EC 100%);
+        }
+
+        /* Tabelas */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+
+        th {
+            background: var(--secondary);
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        tr:hover {
+            background: #F9FAFB;
+        }
+
+        /* Diagramas de Fluxo */
+        .flow-diagram {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            margin: 2rem 0;
+            justify-content: center;
+        }
+
+        .flow-item {
+            background: white;
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            min-width: 180px;
+            text-align: center;
+            font-weight: 600;
+            color: var(--secondary);
+        }
+
+        .flow-arrow {
+            font-size: 2rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+        }
+
+        /* Seção de Faturação */
+        .invoice-box {
+            background: linear-gradient(135deg, #F5F7FA 0%, #FFFFFF 100%);
+            border: 2px solid var(--border-light);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .invoice-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .invoice-row.total {
+            border-bottom: 3px solid var(--primary);
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: var(--primary);
+            padding: 1.2rem 0;
+        }
+
+        .invoice-row.section-header {
+            background: var(--secondary);
+            color: white;
+            padding: 1rem;
+            margin: 1rem -2rem 0.5rem -2rem;
+            font-weight: bold;
+        }
+
+        /* Comparação */
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .comparison-item {
+            border: 2px solid var(--border-light);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .comparison-item.positive {
+            border-color: var(--accent);
+            background: linear-gradient(135deg, #E8F8F5 0%, #F0FFFE 100%);
+        }
+
+        .comparison-item.negative {
+            border-color: #E74C3C;
+            background: linear-gradient(135deg, #FADBD8 0%, #FDEDEC 100%);
+        }
+
+        .comparison-label {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .comparison-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 1rem 0;
+        }
+
+        .comparison-item.positive .comparison-value {
+            color: var(--accent);
+        }
+
+        .comparison-item.negative .comparison-value {
+            color: #E74C3C;
+        }
+
+        /* Stats */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .stat-box {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 0.5rem 0;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        /* Checklist */
+        .checklist {
+            list-style: none;
+            margin: 1.5rem 0;
+        }
+
+        .checklist li {
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            background: #F9FAFB;
+            border-left: 4px solid var(--accent);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .checklist li::before {
+            content: '\f00c';
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            color: var(--accent);
+            font-size: 1.1rem;
+        }
+
+        /* Accordion */
+        .accordion {
+            margin: 1.5rem 0;
+        }
+
+        .accordion-item {
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+
+        .accordion-header {
+            background: var(--neutral-light);
+            padding: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            transition: background 0.3s ease;
+        }
+
+        .accordion-header:hover {
+            background: #E8E8E8;
+        }
+
+        .accordion-header.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            padding: 0 1.5rem;
+        }
+
+        .accordion-content.active {
+            max-height: 500px;
+            padding: 1.5rem;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--secondary);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+        }
+
+        /* Image Responsiveness */
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Table Responsiveness */
+        .table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin: 1.5rem 0;
+        }
+
+        /* Touch-friendly elements */
+        @media (hover: none) and (pointer: coarse) {
+            .btn,
+            .accordion-header,
+            .nav-links a {
+                min-height: 44px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .container {
+                padding: 5rem 1.5rem 1.5rem;
+            }
+
+            section {
+                padding: 3rem 2rem;
+            }
+
+            .grid-2 {
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            }
+
+            .grid-3 {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 1rem 1.5rem;
+            }
+
+            .logo {
+                font-size: 1.5rem;
+            }
+
+            .logo img {
+                height: 40px !important;
+            }
+
+            .menu-toggle {
+                display: flex;
+            }
+
+            .nav-links {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 70%;
+                max-width: 300px;
+                height: 100vh;
+                background: white;
+                flex-direction: column;
+                padding: 5rem 2rem 2rem;
+                box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+                transition: right 0.3s ease;
+                gap: 0;
+                z-index: 1000;
+            }
+
+            .nav-links.active {
+                right: 0;
+            }
+
+            .nav-links li {
+                width: 100%;
+                border-bottom: 1px solid var(--border-light);
+            }
+
+            .nav-links a {
+                display: block;
+                padding: 1rem 0;
+                font-size: 1.1rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            h2 {
+                font-size: 1.6rem;
+            }
+
+            h3 {
+                font-size: 1.2rem;
+            }
+
+            .hero {
+                padding: 3rem 1.5rem !important;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero p {
+                font-size: 1.1rem;
+            }
+
+            .container {
+                padding: 5rem 1rem 1rem;
+            }
+
+            section {
+                padding: 2rem 1.5rem;
+                margin-bottom: 2rem;
+            }
+
+            .grid-2,
+            .grid-3,
+            .grid-4 {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .comparison {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-container {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+
+            .flow-diagram {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .flow-arrow {
+                transform: rotate(90deg);
+            }
+
+            .flow-item {
+                min-width: 100%;
+                padding: 1.2rem;
+            }
+
+            .card {
+                padding: 1.5rem;
+            }
+
+            .btn {
+                padding: 0.8rem 1.5rem;
+                font-size: 0.95rem;
+                width: 100%;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            table {
+                font-size: 0.9rem;
+            }
+
+            th,
+            td {
+                padding: 0.8rem 0.5rem;
+            }
+
+            .invoice-box {
+                padding: 1.5rem;
+                font-size: 0.9rem;
+            }
+
+            .invoice-row {
+                padding: 0.6rem 0;
+                flex-wrap: wrap;
+            }
+
+            .invoice-row span {
+                font-size: 0.9rem;
+            }
+
+            .stat-number {
+                font-size: 2rem;
+            }
+
+            .comparison-value {
+                font-size: 2rem;
+            }
+
+            .accordion-header {
+                padding: 1rem;
+                font-size: 0.95rem;
+            }
+
+            .accordion-content {
+                font-size: 0.9rem;
+            }
+
+            footer {
+                padding: 1.5rem 1rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo {
+                font-size: 1.3rem;
+            }
+
+            .logo img {
+                height: 35px !important;
+            }
+
+            h1 {
+                font-size: 1.75rem;
+            }
+
+            h2 {
+                font-size: 1.4rem;
+            }
+
+            h3 {
+                font-size: 1.1rem;
+            }
+
+            .hero h1 {
+                font-size: 1.75rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            section {
+                padding: 1.5rem 1rem;
+            }
+
+            .card {
+                padding: 1.25rem;
+            }
+
+            .card-icon {
+                font-size: 2rem;
+            }
+
+            .stat-number {
+                font-size: 1.75rem;
+            }
+
+            .comparison-value {
+                font-size: 1.75rem;
+            }
+
+            .invoice-box {
+                padding: 1rem;
+                font-size: 0.85rem;
+            }
+
+            .invoice-row.section-header {
+                margin: 1rem -1rem 0.5rem -1rem;
+                padding: 0.8rem;
+                font-size: 0.85rem;
+            }
+
+            table {
+                font-size: 0.85rem;
+            }
+
+            th,
+            td {
+                padding: 0.6rem 0.4rem;
+            }
+
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+
+            .grid-4 {
+                gap: 1rem;
+            }
+        }
+
+        /* Animações */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        section {
+            animation: slideIn 0.6s ease-out;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--neutral-light);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Mobile Menu Overlay -->
+    <div class="menu-overlay" onclick="closeMenu()"></div>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo">
+            <img src="images/b2s.png" alt="b2s logo" style="height: 50px;">
+        </div>
+        <div class="menu-toggle" onclick="toggleMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#problema" onclick="closeMenu()">Problema</a></li>
+            <li><a href="#solucao" onclick="closeMenu()">Solução</a></li>
+            <li><a href="#funcionamento" onclick="closeMenu()">Como Funciona</a></li>
+            <li><a href="#faturacao" onclick="closeMenu()">Faturação</a></li>
+            <li><a href="#tecnologia" onclick="closeMenu()">Tecnologia</a></li>
+            <li><a href="#beneficios" onclick="closeMenu()">Benefícios</a></li>
+            <li><a href="#faq" onclick="closeMenu()">FAQ</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <!-- Hero Section -->
+        <section class="hero">
+            <h1>PAYT - Pay As You Throw</h1>
+            <p>Sistema Inteligente de Gestão de Cobranças e Recompensas para Resíduos Urbanos</p>
+            <p style="font-size: 1rem; opacity: 0.85;">Plataforma Bee2waste | Bee2solutions</p>
+            <div class="hero-buttons">
+                <button class="btn btn-primary">Explorar Solução</button>
+                <button class="btn btn-secondary">Conhecer Benefícios</button>
+            </div>
+        </section>
+
+        <!-- Problema Section -->
+        <section id="problema">
+            <h2>O Problema Atual</h2>
+            <p>Os sistemas tradicionais de gestão de resíduos utilizam tarifação fixa, criando um desequilíbrio
+                fundamental: <strong>utilizadores pagam o mesmo independentemente da quantidade de lixo que
+                    produzem</strong>.</p>
+
+            <div class="grid-3">
+                <div class="card">
+                    <div class="card-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                    <h3>Falta de Incentivos</h3>
+                    <p>Sem benefício financeiro em reduzir resíduos, a população não tem motivação para mudar
+                        comportamentos.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon"><i class="fa-solid fa-scale-balanced"></i></div>
+                    <h3>Injustiça Financeira</h3>
+                    <p>Famílias numerosas pagam o mesmo que pessoas isoladas. Quem recicla subsidia quem não separa.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon"><i class="fa-solid fa-earth-americas"></i></div>
+                    <h3>Impacto Ambiental</h3>
+                    <p>Produção excessiva de resíduos, aterros sobrecarregados, aumento de emissões de CO₂.</p>
+                </div>
+            </div>
+
+            <div class="highlight-box danger">
+                <strong>Realidade Atual:</strong> Sistema tradicional não consegue motivar mudanças comportamentais
+                estruturais que beneficiem o ambiente.
+            </div>
+        </section>
+
+        <!-- Solução Section -->
+        <section id="solucao">
+            <h2>A Solução: PAYT</h2>
+            <p>O PAYT (Pay As You Throw) é um sistema de tarifação baseado no <strong>princípio do
+                    utilizador-pagador</strong>, onde o custo é proporcional ao volume real de resíduos produzidos.</p>
+
+            <div class="highlight-box">
+                <strong>Conceito Fundamental:</strong> Alinhar incentivos económicos pessoais com objetivos ambientais.
+                Reduzir lixo = economizar dinheiro. Reciclar melhor = conta menor.
+            </div>
+
+            <div class="grid-3" style="margin-top: 2rem;">
+                <div class="card">
+                    <div class="card-icon"><i class="fa-solid fa-sack-dollar"></i></div>
+                    <h3>Transparência</h3>
+                    <p>Utilizador vê exatamente quanto paga e por quê. Conexão clara entre ação e resultado financeiro.
+                    </p>
+                </div>
+                <div class="card">
+                    <div class="card-icon"><i class="fa-solid fa-bullseye"></i></div>
+                    <h3>Equidade</h3>
+                    <p>Cada um paga proporcionalmente ao que produz. Quem menos resíduos gera, menos paga.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon"><i class="fa-solid fa-seedling"></i></div>
+                    <h3>Sustentabilidade</h3>
+                    <p>Incentivo direto para reduzir, reutilizar e reciclar. Comportamento sustentável é recompensado.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Funcionamento Section -->
+        <section id="funcionamento">
+            <h2>Como Funciona: Três Componentes</h2>
+
+            <h3><i class="fa-solid fa-1" style="margin-right: 0.5rem;"></i> Tarifa de Disponibilidade (Componente Fixa)
+            </h3>
+            <div class="card">
+                <p><strong>O que é:</strong> Valor diário fixo que garante disponibilidade do serviço</p>
+                <p><strong>Cálculo:</strong> Xi [€/Dia] × Número de dias do mês</p>
+                <p><strong>Exemplo:</strong> 0,20€/dia × 30 dias = 6,00€/mês</p>
+                <p><strong>Propósito:</strong> Cobrir custos operacionais base (pessoal, manutenção, disponibilidade)
+                </p>
+            </div>
+
+            <h3><i class="fa-solid fa-2" style="margin-right: 0.5rem;"></i> Tarifa Variável (Baseada em Resíduos)</h3>
+            <div class="card">
+                <p><strong>Fórmula:</strong> <code>a(i) × Volume Indiferenciado – b(i) × Volume Seletivo</code></p>
+                <p>O sistema <strong>cobra por indiferenciado</strong> e <strong>concede créditos por
+                        seletivos</strong>.</p>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Tipo de Resíduo</th>
+                                <th>Valor</th>
+                                <th>Efeito</th>
+                                <th>Exemplo (100L)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Indiferenciado</strong></td>
+                                <td>0,35€/L</td>
+                                <td>Débito (paga)</td>
+                                <td style="color: var(--primary); font-weight: bold;">+35,00€</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Embalagens</strong></td>
+                                <td>-0,08€/L</td>
+                                <td>Crédito (poupa)</td>
+                                <td style="color: var(--accent); font-weight: bold;">-8,00€</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Papel</strong></td>
+                                <td>-0,05€/L</td>
+                                <td>Crédito (poupa)</td>
+                                <td style="color: var(--accent); font-weight: bold;">-5,00€</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Vidro</strong></td>
+                                <td>-0,03€/L</td>
+                                <td>Crédito (poupa)</td>
+                                <td style="color: var(--accent); font-weight: bold;">-3,00€</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Compostagem</strong></td>
+                                <td>-0,05€/L</td>
+                                <td>Desconto Especial</td>
+                                <td style="color: var(--accent); font-weight: bold;">-5,00€</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <h3><i class="fa-solid fa-3" style="margin-right: 0.5rem;"></i> Taxa Geral de Resíduos (TGR)</h3>
+            <div class="card">
+                <p><strong>O que é:</strong> Contribuição fixa para gestão geral e tratamento de resíduos</p>
+                <p><strong>Cálculo:</strong> Z [€/Dia] × Número de dias</p>
+                <p><strong>Exemplo:</strong> 3,00€/dia × 30 dias = 90,00€/mês</p>
+                <p><strong>Propósito:</strong> Financiar infraestruturas, processamento, reciclagem, aterros</p>
+            </div>
+        </section>
+
+        <!-- Faturação Section -->
+        <section id="faturacao">
+            <h2>Exemplo Prático de Faturação</h2>
+            <p>Simulação de um mês real com uma família de 4 pessoas:</p>
+
+            <div class="invoice-box">
+                <div style="text-align: center; margin-bottom: 2rem;">
+                    <h3 style="margin: 0;">FATURA MENSAL PAYT</h3>
+                    <p style="margin: 0.5rem 0; color: #666;">Período: 1 a 31 de Janeiro | Contrato: CT-12345</p>
+                </div>
+
+                <div class="invoice-row section-header">COMPONENTE FIXA - TARIFA DE DISPONIBILIDADE</div>
+                <div class="invoice-row">
+                    <span>Serviço de Disponibilidade</span>
+                    <span style="color: var(--primary); font-weight: bold;">6,00€</span>
+                </div>
+
+                <div class="invoice-row section-header">COMPONENTE VARIÁVEL - RESÍDUOS</div>
+                <div style="padding: 0.8rem 0; color: #666; font-style: italic;">Débitos (o que você paga)</div>
+                <div class="invoice-row">
+                    <span style="padding-left: 1.5rem;">Indiferenciado: 245L × 0,35€/L</span>
+                    <span style="color: var(--primary); font-weight: bold;">+85,75€</span>
+                </div>
+
+                <div style="padding: 0.8rem 0; color: #666; font-style: italic;">Créditos (economias por separação)
+                </div>
+                <div class="invoice-row">
+                    <span style="padding-left: 1.5rem;">Embalagens: 80L × 0,08€/L</span>
+                    <span style="color: var(--accent); font-weight: bold;">-6,40€</span>
+                </div>
+                <div class="invoice-row">
+                    <span style="padding-left: 1.5rem;">Papel: 120L × 0,05€/L</span>
+                    <span style="color: var(--accent); font-weight: bold;">-6,00€</span>
+                </div>
+                <div class="invoice-row">
+                    <span style="padding-left: 1.5rem;">Vidro: 100L × 0,03€/L</span>
+                    <span style="color: var(--accent); font-weight: bold;">-3,00€</span>
+                </div>
+
+                <div style="padding: 0.8rem 0; color: #666; font-style: italic;">Descontos Especiais</div>
+                <div class="invoice-row">
+                    <span style="padding-left: 1.5rem;">Compostagem Doméstica: 50L × 0,05€/L</span>
+                    <span style="color: var(--accent); font-weight: bold;">-2,50€</span>
+                </div>
+
+                <div class="invoice-row section-header">TAXA GERAL DE RESÍDUOS (TGR)</div>
+                <div class="invoice-row">
+                    <span>Gestão e Tratamento</span>
+                    <span style="color: var(--primary); font-weight: bold;">90,00€</span>
+                </div>
+
+                <div class="invoice-row total">
+                    <span style="font-size: 1.2rem;">TOTAL A PAGAR</span>
+                    <span style="font-size: 1.3rem;">163,85€</span>
+                </div>
+
+                <div
+                    style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 2px solid var(--border-light); color: var(--accent); font-weight: bold;">
+                    <i class="fa-solid fa-lightbulb"></i> Comparação: Dezembro pagou 175,20€ | Poupança em Janeiro:
+                    -11,35€ ↓
+                </div>
+            </div>
+
+            <h3>Impacto Progressivo: Mudança de Comportamento</h3>
+            <div class="grid-3">
+                <div class="comparison-item negative">
+                    <div class="comparison-label">Mês 1 (Sem Ajustes)</div>
+                    <p>Comportamento: Sem mudanças</p>
+                    <div class="comparison-value">154,00€</div>
+                    <small>+34,00€ vs tradicional</small>
+                </div>
+                <div class="comparison-item"
+                    style="border-color: #F39C12; background: linear-gradient(135deg, #FEF5E7 0%, #FCF3E6 100%);">
+                    <div class="comparison-label">Mês 3 (Ajustado)</div>
+                    <p>Comportamento: Consciente</p>
+                    <div class="comparison-value" style="color: #F39C12;">113,10€</div>
+                    <small>-6,90€/mês = -82,80€/ano</small>
+                </div>
+                <div class="comparison-item positive">
+                    <div class="comparison-label">Ideal (Zero Waste)</div>
+                    <p>Comportamento: Máximo</p>
+                    <div class="comparison-value">88,50€</div>
+                    <small>-31,50€/mês = -378€/ano</small>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tecnologia Section -->
+        <section id="tecnologia">
+            <h2>Tecnologia: Identificação com RFID</h2>
+            <p>O sistema utiliza <strong>etiquetas RFID (Radio Frequency Identification)</strong> para identificar cada
+                contentor automaticamente durante a recolha.</p>
+
+            <h3>Como Funciona o Processo de Recolha</h3>
+            <img src="images/payt_diagram.png" alt="Processo de Recolha PAYT"
+                style="max-width: 100%; height: auto; display: block; margin: 1rem auto;">
+
+            <div class="flow-diagram">
+                <div class="flow-item">1. Viatura chega ao local</div>
+                <div class="flow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+                <div class="flow-item">2. Leitor RFID deteta etiqueta</div>
+                <div class="flow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+                <div class="flow-item">3. Sistema identifica contentor</div>
+                <div class="flow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+                <div class="flow-item">4. Volume registado</div>
+                <div class="flow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+                <div class="flow-item">5. Sincronização automática</div>
+            </div>
+
+            <h3>Fluxo de Dados Completo</h3>
+            <div class="grid-2">
+                <div class="card">
+                    <h4>Recolha em Campo</h4>
+                    <ul class="checklist">
+                        <li>GPS regista localização</li>
+                        <li>Leitor RFID identifica contentor</li>
+                        <li>Volume é registado (litros)</li>
+                        <li>Nível enchimento confirmado (%)</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h4>Processamento Central</h4>
+                    <ul class="checklist">
+                        <li>Agregação de dados por período</li>
+                        <li>Cálculo de tarifação automático</li>
+                        <li>Validação de inconsistências</li>
+                        <li>Geração de faturação</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="highlight-box">
+                <strong>Vantagens da Tecnologia RFID:</strong>
+                <ul style="margin-left: 2rem; margin-top: 1rem;">
+                    <li><strong>Automatização:</strong> Elimina erros de digitação manual</li>
+                    <li><strong>Rastreabilidade:</strong> Cada recolha é documentada com precisão</li>
+                    <li><strong>Conformidade:</strong> Apenas contentores autorizados são processados</li>
+                    <li><strong>Tempo Real:</strong> Informação disponível imediatamente</li>
+                    <li><strong>Prevenção de Fraude:</strong> Impossível ocultar recolhas</li>
+                </ul>
+            </div>
+
+            <h3>Plataforma Bee2waste - Módulos Principais</h3>
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-icon"><i class="fa-solid fa-clipboard-list"></i></div>
+                    <h3>Gestão de Contratos</h3>
+                    <p>Criar, editar e acompanhar todos os contratos de clientes com histórico completo de movimentos.
+                    </p>
+                </div>
+                <div class="card">
+                    <div class="card-icon"><i class="fa-solid fa-money-bill-wave"></i></div>
+                    <h3>Gestão de Tarifários</h3>
+                    <p>Definir estruturas de preços dinâmicas com componentes variáveis e fixas adaptáveis.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon"><i class="fa-solid fa-calendar-days"></i></div>
+                    <h3>Períodos de Faturação</h3>
+                    <p>Controlo total sobre ciclos de faturação com estados (Novo, Aberto, Fechado).</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon"><i class="fa-solid fa-gear"></i></div>
+                    <h3>Processamento Automático</h3>
+                    <p>Análise detalhada, validação automática, aplicação de acertos e integração com sistemas externos.
+                    </p>
+                </div>
+                <div class="card">
+                    <div class="card-icon"><i class="fa-solid fa-chart-bar"></i></div>
+                    <h3>Reporting & Analytics</h3>
+                    <p>Dashboards interativos, relatórios personalizáveis, alertas automáticos sobre desvios.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon"><i class="fa-solid fa-link"></i></div>
+                    <h3>Integração API</h3>
+                    <p>Exportação completa de dados e integração com sistemas externos de cobrança.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Benefícios Section -->
+        <section id="beneficios">
+            <h2>Benefícios Mensuráveis</h2>
+
+            <h3>Para o Ambiente</h3>
+            <div class="grid-4">
+                <div class="stat-box">
+                    <div class="stat-label">Redução de Resíduos</div>
+                    <div class="stat-number">10-25%</div>
+                    <div class="stat-label">Primeiros anos</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Aumento Reciclagem</div>
+                    <div class="stat-number">15-40%</div>
+                    <div class="stat-label">Por contexto</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Redução CO₂</div>
+                    <div class="stat-number">20-30%</div>
+                    <div class="stat-label">No transporte</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Vida Aterro</div>
+                    <div class="stat-number">+10 anos</div>
+                    <div class="stat-label">Extensão</div>
+                </div>
+            </div>
+
+            <h3>Para os Utilizadores</h3>
+            <div class="grid-3">
+                <div class="card">
+                    <div class="card-icon"><i class="fa-solid fa-sack-dollar"></i></div>
+                    <h3>Poupança Económica</h3>
+                    <p><strong>20-40%</strong> de redução nas tarifas para utilizadores responsáveis. Comportamento
+                        sustentável é imediatamente recompensado.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
+                    <h3>Transparência Total</h3>
+                    <p>Ver exatamente onde vai o dinheiro. Portal de faturação detalhado com comparativos mês a mês.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon"><i class="fa-solid fa-bullseye"></i></div>
+                    <h3>Controlo Pessoal</h3>
+                    <p>Poder real sobre a fatura. Cada decisão de consumo tem impacto direto no valor a pagar.</p>
+                </div>
+            </div>
+
+            <h3>Para a Administração</h3>
+            <div class="grid-3">
+                <div class="card">
+                    <div class="card-icon"><i class="fa-solid fa-chart-bar"></i></div>
+                    <h3>Dados Precisos</h3>
+                    <p>Informação detalhada sobre padrões de produção de resíduos. Planeamento baseado em dados reais.
+                    </p>
+                </div>
+                <div class="card">
+                    <div class="card-icon"><i class="fa-solid fa-gear"></i></div>
+                    <h3>Eficiência Operacional</h3>
+                    <p>Otimização de rotas, redução de custos operacionais, melhor utilização de infraestruturas.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon"><i class="fa-solid fa-lightbulb"></i></div>
+                    <h3>Sustentabilidade</h3>
+                    <p>Modelo financeiramente viável a longo prazo. Alinhamento com objetivos ambientais EU.</p>
+                </div>
+            </div>
+
+            <h3>Impacto em Comunidade de 50.000 Habitantes</h3>
+            <div class="grid-4">
+                <div class="stat-box" style="background: linear-gradient(135deg, #27AE60 0%, #229954 100%);">
+                    <div class="stat-label">Menos Lixo/Ano</div>
+                    <div class="stat-number">1.250 t</div>
+                </div>
+                <div class="stat-box" style="background: linear-gradient(135deg, #27AE60 0%, #229954 100%);">
+                    <div class="stat-label">CO₂ Reduzido/Ano</div>
+                    <div class="stat-number">500 t</div>
+                </div>
+                <div class="stat-box" style="background: linear-gradient(135deg, #27AE60 0%, #229954 100%);">
+                    <div class="stat-label">Reciclados/Ano</div>
+                    <div class="stat-number">+40%</div>
+                </div>
+                <div class="stat-box" style="background: linear-gradient(135deg, #27AE60 0%, #229954 100%);">
+                    <div class="stat-label">Aterro Extra</div>
+                    <div class="stat-number">+10 anos</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ Section -->
+        <section id="faq">
+            <h2>Perguntas Frequentes</h2>
+
+            <div class="accordion">
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <span>Se não tiver lixo, não pago nada?</span>
+                        <span>+</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>Paga sempre a <strong>tarifa de disponibilidade</strong> (serviço estar "pronto") e a
+                            <strong>TGR</strong>. Isto garante que o serviço está disponível para qualquer necessidade.
+                            Mas se produzir muito pouco lixo indiferenciado, a sua fatura será significativamente menor.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <span>Quanto posso poupar por mês?</span>
+                        <span>+</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>Depende dos seus hábitos atuais. Uma família média que separar bem pode poupar
+                            <strong>5-20€/mês</strong>. Quem adota estilo <strong>zero waste</strong> pode poupar
+                            <strong>30€+/mês = 360€+/ano</strong>.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <span>O que acontece se não separar bem?</span>
+                        <span>+</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>Todos os resíduos contarão como <strong>"indiferenciado"</strong> e será cobrado o valor
+                            total (0,35€/L). Com separação, tem <strong>descontos significativos</strong>. O sistema
+                            incentiva através do preço:</p>
+                        <ul class="checklist">
+                            <li>Sem separação: 100L = 35€</li>
+                            <li>Com separação: 100L = 10€ (com créditos)</li>
+                            <li>Diferença: -25€/mês = -300€/ano</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <span>Como funciona se viajar e não gerar lixo?</span>
+                        <span>+</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>A <strong>tarifa de disponibilidade</strong> é cobrada mesmo se não recolher lixo nesse mês
+                            (o serviço está disponível). A <strong>componente variável</strong> só é cobrada pelos
+                            resíduos <strong>realmente produzidos</strong>.</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <span>Como sabe o sistema quanto lixo produzi?</span>
+                        <span>+</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>Cada contentor tem uma <strong>etiqueta RFID única</strong>. Quando é recolhido, o motorista
+                            regista o volume em litros. Estes dados são <strong>sincronizados automaticamente</strong>
+                            com a plataforma e usados para calcular a fatura.</p>
+                        <p><strong>Vantagens:</strong></p>
+                        <ul class="checklist">
+                            <li>Sem erros de digitação manual</li>
+                            <li>Rastreabilidade completa</li>
+                            <li>Prevenção de fraude</li>
+                            <li>Dados em tempo real</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <span>Posso ter compostagem em apartamento?</span>
+                        <span>+</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>Sim! Compostagem em pequena escala é possível com:</p>
+                        <ul class="checklist">
+                            <li>Compostores de balcão (vermicompostagem)</li>
+                            <li>Caixas compostoras especializadas</li>
+                            <li>Até mesmo um balde com tampa na cozinha</li>
+                        </ul>
+                        <p>O desconto aplica-se mesmo a pequenos volumes (-0,05€/L).</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <span>Como vejo meu histórico de faturação?</span>
+                        <span>+</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>Na <strong>plataforma Bee2waste</strong>, pode acompanhar:</p>
+                        <ul class="checklist">
+                            <li>Todas as faturas mês a mês</li>
+                            <li>Recolhas de cada tipo de resíduo</li>
+                            <li>Comparativos de períodos anteriores</li>
+                            <li>Evolução dos seus hábitos</li>
+                            <li>Relatórios detalhados</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <span>Discordo de um valor. Como resolver?</span>
+                        <span>+</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p><strong>Processo:</strong></p>
+                        <ol style="margin-left: 1.5rem; margin-top: 1rem;">
+                            <li>Consulte sua fatura detalhada na plataforma</li>
+                            <li>Verifique os registos de recolha com datas e volumes</li>
+                            <li>Contacte o suporte com evidências</li>
+                            <li>Pode solicitar revisão antes do pagamento</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Próximos Passos Section -->
+        <section>
+            <h2>Próximos Passos</h2>
+
+            <h3>Para o Gestor Municipal/Entidade</h3>
+            <div class="grid-4">
+                <div class="card">
+                    <div class="card-icon"><i class="fa-solid fa-clipboard-list"></i></div>
+                    <h3>Fase 1-2</h3>
+                    <p><strong>Definição Estratégica</strong></p>
+                    <small>Análise, tarifários, comunicação</small>
+                </div>
+                <div class="card">
+                    <div class="card-icon"><i class="fa-solid fa-gear"></i></div>
+                    <h3>Fase 3-4</h3>
+                    <p><strong>Implementação Técnica</strong></p>
+                    <small>Plataforma, RFID, testes</small>
+                </div>
+                <div class="card">
+                    <div class="card-icon"><i class="fa-solid fa-flask"></i></div>
+                    <h3>Fase 5</h3>
+                    <p><strong>Piloto Controlado</strong></p>
+                    <small>Zona limitada, monitorização</small>
+                </div>
+                <div class="card">
+                    <div class="card-icon"><i class="fa-solid fa-rocket"></i></div>
+                    <h3>Fase 6+</h3>
+                    <p><strong>Expansão Progressiva</strong></p>
+                    <small>Alargamento, otimização</small>
+                </div>
+            </div>
+
+            <h3>Para o Utilizador</h3>
+            <div class="flow-diagram">
+                <div class="flow-item"
+                    style="background: linear-gradient(135deg, #FBE9E7 0%, #FCE4EC 100%); border-color: var(--primary);">
+                    <strong>Semana 1</strong><br>Comunicação
+                </div>
+                <div class="flow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+                <div class="flow-item"
+                    style="background: linear-gradient(135deg, #FEF5E7 0%, #FCF3E6 100%); border-color: #F39C12;">
+                    <strong>Semana 2</strong><br>Sensibilização
+                </div>
+                <div class="flow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+                <div class="flow-item"
+                    style="background: linear-gradient(135deg, #E8F8F5 0%, #F0FFFE 100%); border-color: var(--accent);">
+                    <strong>Semana 3</strong><br>Esclarecimentos
+                </div>
+                <div class="flow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+                <div class="flow-item"
+                    style="background: linear-gradient(135deg, #E8F4F8 0%, #EBF5FB 100%); border-color: #3498DB;">
+                    <strong>Semana 4+</strong><br>Operação
+                </div>
+            </div>
+        </section>
+
+        <!-- Conclusão Section -->
+        <section>
+            <h2>Conclusão: Uma Nova Forma de Pensar Resíduos</h2>
+
+            <div class="highlight-box">
+                <h3 style="margin-top: 0;">O PAYT não é apenas um sistema de cobranças.</h3>
+                <p>É um <strong>mecanismo de mudança comportamental</strong> baseado em incentivos económicos que
+                    alinha:</p>
+            </div>
+
+            <div class="grid-3" style="margin: 2rem 0;">
+                <div class="card" style="text-align: center;">
+                    <div class="card-icon"><i class="fa-solid fa-user"></i></div>
+                    <h3>Interesse Pessoal</h3>
+                    <p>Economizar dinheiro através de comportamentos sustentáveis</p>
+                </div>
+                <div class="card" style="text-align: center;">
+                    <div class="card-icon"><i class="fa-solid fa-earth-americas"></i></div>
+                    <h3>Interesse Ambiental</h3>
+                    <p>Reduzir resíduos, aumentar reciclagem, preservar recursos</p>
+                </div>
+                <div class="card" style="text-align: center;">
+                    <div class="card-icon"><i class="fa-solid fa-scale-balanced"></i></div>
+                    <h3>Interesse Social</h3>
+                    <p>Equidade financeira e responsabilidade comunitária</p>
+                </div>
+            </div>
+
+            <h3>Impacto Transformacional</h3>
+            <div class="grid-3">
+                <div class="comparison-item positive">
+                    <div class="comparison-label">Curto Prazo (0-3 meses)</div>
+                    <p>Aumento de 5-10% em separação seletiva</p>
+                    <p>Redução de 3-5% em indiferenciado</p>
+                </div>
+                <div class="comparison-item positive">
+                    <div class="comparison-label">Médio Prazo (3-12 meses)</div>
+                    <p>Redução sustentada de 15-20%</p>
+                    <p>Reciclagem aumenta 30-40%</p>
+                </div>
+                <div class="comparison-item positive">
+                    <div class="comparison-label">Longo Prazo (12+ meses)</div>
+                    <p>Redução total de 25%+</p>
+                    <p>Economia circular instalada</p>
+                </div>
+            </div>
+
+            <div class="highlight-box"
+                style="background: linear-gradient(135deg, #E8F8F5 0%, #F0FFFE 100%); border-left-color: var(--accent); margin-top: 2rem;">
+                <h3 style="margin-top: 0; color: var(--accent);"><i class="fa-solid fa-bullseye"></i> Chamada à Ação
+                </h3>
+                <p>O PAYT representa uma oportunidade única de transformar a relação da comunidade com os resíduos. Esta
+                    não é uma mudança de sistema administrativo, é uma <strong>mudança de paradigma</strong> onde cada
+                    utilizador se torna um agente ativo na construção de um futuro sustentável.</p>
+                <p style="margin-bottom: 0; font-weight: 600;">Bem-vindo ao PAYT. Bem-vindo a uma forma mais justa, mais
+                    transparente, mais sustentável de gerir resíduos.</p>
+            </div>
+
+            <div
+                style="text-align: center; margin-top: 3rem; padding-top: 2rem; border-top: 2px solid var(--border-light);">
+                <p style="color: #999; font-size: 0.9rem;">
+                    <strong>Versão:</strong> 1.0 - Apresentação Completa<br>
+                    <strong>Data:</strong> 22 de Novembro de 2025<br>
+                    <strong>Plataforma:</strong> Bee2waste | Bee2solutions<br>
+                    <strong>Próxima Revisão:</strong> Março de 2026
+                </p>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2025 Bee2solutions | Bee2waste™ | Todos os direitos reservados</p>
+        <p style="font-size: 0.9rem; margin-top: 1rem;">Herdade da Barba Rala, Rua Luís Adelino Fonseca, Lote 1-A |
+            7005-345 Évora | Portugal</p>
+    </footer>
+
+    <script>
+        // Mobile menu toggle
+        function toggleMenu() {
+            const navLinks = document.querySelector('.nav-links');
+            const menuToggle = document.querySelector('.menu-toggle');
+            const menuOverlay = document.querySelector('.menu-overlay');
+            const body = document.body;
+
+            navLinks.classList.toggle('active');
+            menuToggle.classList.toggle('active');
+            menuOverlay.classList.toggle('active');
+
+            // Prevent body scroll when menu is open
+            if (navLinks.classList.contains('active')) {
+                body.style.overflow = 'hidden';
+            } else {
+                body.style.overflow = '';
+            }
+        }
+
+        function closeMenu() {
+            const navLinks = document.querySelector('.nav-links');
+            const menuToggle = document.querySelector('.menu-toggle');
+            const menuOverlay = document.querySelector('.menu-overlay');
+            const body = document.body;
+
+            navLinks.classList.remove('active');
+            menuToggle.classList.remove('active');
+            menuOverlay.classList.remove('active');
+            body.style.overflow = '';
+        }
+
+        // Close menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const navLinks = document.querySelector('.nav-links');
+            const menuToggle = document.querySelector('.menu-toggle');
+            const isClickInside = navLinks.contains(event.target) || menuToggle.contains(event.target);
+
+            if (!isClickInside && navLinks.classList.contains('active')) {
+                closeMenu();
+            }
+        });
+
+        // Accordion functionality
+        function toggleAccordion(header) {
+            const content = header.nextElementSibling;
+            const isActive = header.classList.contains('active');
+
+            // Close all other accordions
+            document.querySelectorAll('.accordion-header').forEach(h => {
+                h.classList.remove('active');
+                h.nextElementSibling.classList.remove('active');
+                h.textContent = h.textContent.replace('−', '+');
+            });
+
+            // Toggle current accordion
+            if (!isActive) {
+                header.classList.add('active');
+                content.classList.add('active');
+                header.innerHTML = header.innerHTML.replace('+', '−');
+            }
+        }
+
+        // Smooth scroll for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+
+        // Button click handlers
+        document.querySelectorAll('.btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const targetId = this.textContent.includes('Benefícios') ? '#beneficios' : '#funcionamento';
+                const target = document.querySelector(targetId);
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+
+        // Add animation on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('section').forEach(section => {
+            section.style.opacity = '0';
+            section.style.transform = 'translateY(20px)';
+            section.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(section);
+        });
+    </script>
+</body>
+
+</html>
